@@ -9,6 +9,15 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB connected"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
+
 mongoose.connect("mongodb://localhost:27017/");
 
 const MessageSchema = new mongoose.Schema({
@@ -17,7 +26,7 @@ const MessageSchema = new mongoose.Schema({
   file: String,
   timestamp: Date
 });
-const Message = mongoose.model("Message", MessageSchema);
+Message = mongoose.model("Message", MessageSchema);
 
 const storage = multer.diskStorage({
   destination: "uploads/",
