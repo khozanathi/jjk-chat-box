@@ -57,7 +57,30 @@ function displayMessage(data) {
   chatWindow.appendChild(div);
 }
 
+/*socket.on("chat", data => {
+  // Display new message in the chat window
+  displayMessage(data);
+});*/
+
 socket.on("chat", data => {
+  const div = document.createElement("div");
+  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+
+  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+
+  if (data.file) {
+    const fileUrl = `/uploads/${data.file}`;
+    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
+
+    if (isImage) {
+      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
+    } else {
+      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
+    }
+  }
+
+  div.innerHTML = content;
+  chatWindow.appendChild(div);
   // Display new message in the chat window
   displayMessage(data);
 });

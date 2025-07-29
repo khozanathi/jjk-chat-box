@@ -4,6 +4,7 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const socketIO = require("socket.io");
 const Message = require('./models/Message');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -43,7 +44,8 @@ io.on("connection", socket => {
   });
 });
 
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Fetch chat history from DB
 app.get('/api/messages', async (req, res) => {
@@ -61,7 +63,8 @@ app.post('/api/messages', async (req, res) => {
   const newMessage = new Message({
     username,
     text,
-    file
+    file: req.file ? req.file.filename : null,
+    timestamp: new Date()
   });
 
   try {
