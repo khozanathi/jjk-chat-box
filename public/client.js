@@ -4,6 +4,7 @@ const messageInput = document.getElementById("messageInput");
 const fileInput = document.getElementById("fileInput");
 const usernameInput = document.getElementById("username");
 const chatWindow = document.getElementById("chat-window");
+const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
 
 // Send a message and save to the database
 function sendMessage() {
