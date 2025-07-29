@@ -18,15 +18,9 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log("✅ MongoDB connected"))
 .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-mongoose.connect("mongodb://localhost:27017/");
+//mongoose.connect("mongodb://localhost:27017/");
 
-const MessageSchema = new mongoose.Schema({
-  username: String,
-  text: String,
-  file: String,
-  timestamp: Date
-});
-Message = mongoose.model("Message", MessageSchema);
+//Message = mongoose.model("Message", MessageSchema);
 
 const storage = multer.diskStorage({
   destination: "uploads/",
