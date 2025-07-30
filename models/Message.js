@@ -1,13 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const messageSchema = new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
   username: String,
-  sender: String,
-  receiver: String,
   text: String,
   file: String,
-  timestamp: { type: Date, default: Date.now }
+  timestamp: Date
 });
 
-// Prevent OverwriteModelError
-module.exports = mongoose.models.Message || mongoose.model('Message', messageSchema);
+module.exports = mongoose.model("Message", MessageSchema);

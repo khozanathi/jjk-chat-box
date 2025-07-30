@@ -4,66 +4,29 @@ const messageInput = document.getElementById("messageInput");
 const fileInput = document.getElementById("fileInput");
 const usernameInput = document.getElementById("username");
 const chatWindow = document.getElementById("chat-window");
-const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
 
-// Send a message and save to the database
 function sendMessage() {
   const username = usernameInput.value.trim();
   const text = messageInput.value.trim();
-  const file = fileInput.files[0] ? fileInput.files[0].name : "";
+  const file = fileInput.files[0];
 
-  if (!username) return alert("Enter your username!");
-  
-  // Emit message to other clients
-  socket.emit("chat", { username, text, file });
-  
-  // Save the message to the database
-  fetch('/api/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, text, file })
+  if (!username) return alert("Please enter your username!");
+
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("text", text);
+  if (file) formData.append("file", file);
+
+  fetch("/api/messages", {
+    method: "POST",
+    body: formData
   });
 
   messageInput.value = "";
   fileInput.value = "";
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  // Fetch chat history from the server when the page loads
-  const response = await fetch('/api/messages');
-  const messages = await response.json();
-
-  // Render the messages
-  messages.forEach(message => {
-    displayMessage(message);
-  });
-});
-
 function displayMessage(data) {
-  const div = document.createElement("div");
-  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
-  
-  div.innerHTML = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-  
-  if (data.file) {
-    const fileExtension = data.file.split('.').pop().toLowerCase();
-
-    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-      div.innerHTML += `<img src="/uploads/${data.file}" alt="${data.file}" class="chat-image">`;
-    } else {
-      div.innerHTML += `<p>📎 <a href="/uploads/${data.file}" target="_blank">${data.file}</a></p>`;
-    }
-  }
-
-  chatWindow.appendChild(div);
-}
-
-/*socket.on("chat", data => {
-  // Display new message in the chat window
-  displayMessage(data);
-});*/
-
-socket.on("chat", data => {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
 
@@ -74,19 +37,28 @@ socket.on("chat", data => {
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
 
     if (isImage) {
-      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
+      content += `<p><img src="${fileUrl}" class="chat-image" alt="Image file" /></p>`;
     } else {
-      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
+      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
     }
   }
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
-  // Display new message in the chat window
-  displayMessage(data);
+}
+
+// Load chat history on page load
+document.addEventListener("DOMContentLoaded", async () => {
+  const response = await fetch("/api/messages");
+  const messages = await response.json();
+
+  messages.forEach(displayMessage);
 });
 
+// Socket event
+socket.on("chat", displayMessage);
 
+// Event listeners
 sendBtn.addEventListener("click", sendMessage);
 messageInput.addEventListener("keypress", e => {
   if (e.key === "Enter") sendMessage();
