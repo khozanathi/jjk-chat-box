@@ -10,6 +10,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+require('dotenv').config();
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -56,5 +58,5 @@ io.on("connection", socket => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+const PORT = process.env.PORT || 7575;
+server.listen(7575, () => console.log("Server running on http://localhost:7575"));
