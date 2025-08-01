@@ -178,12 +178,3 @@ strong {
 .message-input i:hover {
   transform: scale(1.1);
 }
-
-.file-preview {
-  margin-top: 10px;
-}
-.preview-image {
-  max-width: 150px;
-  border-radius: 4px;
-  margin-top: 5px;
-}
