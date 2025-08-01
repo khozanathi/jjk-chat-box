@@ -4,6 +4,7 @@ const messageInput = document.getElementById("messageInput");
 const fileInput = document.getElementById("fileInput");
 const usernameInput = document.getElementById("username");
 const chatWindow = document.getElementById("chat-window");
+const fileUrl = `/uploads/${data.file}`;
 
 function sendMessage() {
   const username = usernameInput.value.trim();
