@@ -11,20 +11,61 @@ function sendMessage() {
   const file = fileInput.files[0];
 
   if (!username) return alert("Please enter your username!");
+  if (!text && !file) return alert("Please enter a message or select a file!");
 
   const formData = new FormData();
   formData.append("username", username);
   formData.append("text", text);
   if (file) formData.append("file", file);
 
-  fetch("/api/messages", {
-    method: "POST",
-    body: formData
-  });
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/api/messages");
 
-  messageInput.value = "";
-  fileInput.value = "";
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      document.getElementById("filePreview").innerHTML = `<p>Uploading: ${percent}%</p>`;
+    }
+  };
+
+  xhr.onload = () => {
+    if (xhr.status === 200) {
+      messageInput.value = "";
+      fileInput.value = "";
+      document.getElementById("filePreview").innerHTML = "";
+    } else {
+      alert("Upload failed.");
+    }
+  };
+
+  xhr.onerror = () => alert("Upload error.");
+  xhr.send(formData);
 }
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  const preview = document.getElementById("filePreview");
+  preview.innerHTML = ""; // Clear previous preview
+
+  if (!file) return;
+
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file.name);
+
+  if (isImage) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = document.createElement("img");
+      img.src = reader.result;
+      img.className = "preview-image";
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    const fileInfo = document.createElement("p");
+    fileInfo.textContent = `📎 ${file.name}`;
+    preview.appendChild(fileInfo);
+  }
+});
 
 function displayMessage(data) {
   const div = document.createElement("div");
