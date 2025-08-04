@@ -26,25 +26,19 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Setup Multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "uploads")); // Use path.join for platform-independent paths
-  },
+  destination: './uploads/',
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Add timestamp to filename for uniqueness
+    const safeName = file.originalname.replace(/[^\w.-]/g, '_');
+    cb(null, Date.now() + '-' + safeName);
   }
 });
 
 const upload = multer({ storage });
 
-// Your other routes and logic here...
-
-// Example route to handle file uploads
-app.post("/upload", upload.single("file"), (req, res) => {
-  // Handle the file upload
-  res.json({ file: req.file });
+app.post('/upload', upload.single('file'), (req, res) => {
+  console.log(req.file);
+  res.send('File uploaded');
 });
-
-
 
 app.use(express.static("public"));
 
