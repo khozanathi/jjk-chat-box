@@ -36,7 +36,6 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
-const BACKEND_URL = `https://jjk-chat-box.onrender.com/uploads/${data.file}`; // Replace with your actual backend URL
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
@@ -44,7 +43,7 @@ function displayMessage(data) {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `${BACKEND_URL}/uploads/${data.file}`;
+    const fileUrl = `/uploads/${data.file}`;
     const fileExtension = data.file.split('.').pop().toLowerCase();
 
     if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
@@ -98,7 +97,7 @@ socket.on("chat", data => {
   displayMessage(data);
 });
 
- //Socket event
+/* Socket event
 socket.on("chat", data => {
   const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
   const div = document.createElement("div");
@@ -107,37 +106,12 @@ socket.on("chat", data => {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `${BACKEND_URL}/uploads/${data.file}`;
-    const fileExtension = data.file.split('.').pop().toLowerCase();
+    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
 
-    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
-      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
-      <p><a href="${fileUrl}" download>Download Image</a></p>
-      `;
-    } else if (["pdf"].includes(fileExtension)) {
-      content += `
-        <p>📄 PDF Preview:</p>
-        <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
-        <p><a href="${fileUrl}" download>Download PDF</a></p>
-      `;
-    } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
-      content += `
-        <p>🎥 Video:</p>
-        <video controls width="300">
-          <source src="${fileUrl}" type="video/${fileExtension}">
-          Your browser does not support the video tag.
-        </video>
-      `;
-    } else if (["mp3", "wav", "ogg"].includes(fileExtension)) {
-      content += `
-        <p>🎧 Audio:</p>
-        <audio controls>
-          <source src="${fileUrl}" type="audio/${fileExtension}">
-          Your browser does not support the audio element.
-        </audio>
-      `;
+    if (isImage) {
+      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
     } else {
-      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
+      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
     }
   }
 
@@ -147,7 +121,7 @@ socket.on("chat", data => {
   // Display new message in the chat window
   displayMessage(data);
 });
-
+*/
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
