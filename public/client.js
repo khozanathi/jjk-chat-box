@@ -72,7 +72,6 @@ socket.on("chat", data => {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `/uploads/${data.file}`;
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
 
     if (isImage) {
@@ -84,9 +83,11 @@ socket.on("chat", data => {
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
+
   // Display new message in the chat window
   displayMessage(data);
 });
+
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
