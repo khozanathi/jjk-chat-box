@@ -23,14 +23,28 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Setup Multer for file uploads
 const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "uploads")); // Use path.join for platform-independent paths
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); // Add timestamp to filename for uniqueness
+  }
 });
+
 const upload = multer({ storage });
+
+// Your other routes and logic here...
+
+// Example route to handle file uploads
+app.post("/upload", upload.single("file"), (req, res) => {
+  // Handle the file upload
+  res.json({ file: req.file });
+});
+
+
 
 app.use(express.static("public"));
 
