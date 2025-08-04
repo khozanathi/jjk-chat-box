@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const socketIo = require("socket.io");
 const multer = require("multer");
 const Message = require("./models/Message"); // Message schema
+const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,18 +25,19 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Ensure uploads folder exists
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
 // Setup Multer for file uploads
 const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    const safeName = file.originalname.replace(/[^\w.-]/g, '_');
-    cb(null, Date.now() + '-' + safeName);
-  }
+  destination: (req, file, cb) => cb(null, "uploads"),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
 });
 
 const upload = multer({ storage });
 
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/uploads', upload.single('file'), (req, res) => {
   console.log(req.file);
   res.send('File uploaded');
 });
@@ -53,22 +55,15 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
-app.post('/api/messages', async (req, res) => {
-  const { username, text, file } = req.body;
-  const newMessage = new Message({
-    username,
-    text,
-    file: req.file ? req.file.filename : null,
-    timestamp: new Date()
-  });
+app.post("/api/messages", upload.single("file"), async (req, res) => {
+  const { username, text } = req.body;
+  const file = req.file ? req.file.filename : null;
 
-  try {
-    await newMessage.save();
-    res.status(201).send('Message saved');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error saving message');
-  }
+  const message = new Message({ username, text, file, timestamp: new Date() });
+  await message.save();
+
+  io.emit("chat", message);
+  res.status(201).json(message);
 });
 
 // Socket.IO connection

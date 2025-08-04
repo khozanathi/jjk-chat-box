@@ -5,45 +5,55 @@ const fileInput = document.getElementById("fileInput");
 const usernameInput = document.getElementById("username");
 const chatWindow = document.getElementById("chat-window");
 
-function sendMessage() {
+async function sendMessage() {
   const username = usernameInput.value.trim();
   const text = messageInput.value.trim();
   const file = fileInput.files[0];
 
   if (!username) return alert("Please enter your username!");
-
-  socket.emit("chat", { username, text, file })
+  if (!text && !file) return alert("Please enter a message or select a file!");
 
   const formData = new FormData();
-  formData.append('username', username);
-  formData.append('text', text);
-  if (fileInput.files[0]) formData.append('file', fileInput.files[0]);
+  formData.append("username", username);
+  formData.append("text", text);
+  if (file) formData.append("file", file);
 
-  fetch('/api/messages', {
-    method: 'POST',
-    body: formData
-  });
+  try {
+    const response = await fetch("/api/messages", {
+      method: "POST",
+      body: formData
+    });
+
+    const savedMessage = await response.json();
+    // Message will be broadcast via Socket.IO
+  } catch (err) {
+    console.error("Error sending message:", err);
+    alert("Failed to send message.");
+  }
 
   messageInput.value = "";
   fileInput.value = "";
+  document.getElementById("filePreview").innerHTML = "";
 }
 
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
-  
-  div.innerHTML = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-  
+
+  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+
   if (data.file) {
+    const fileUrl = `/uploads/${data.file}`;
     const fileExtension = data.file.split('.').pop().toLowerCase();
 
-    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-      div.innerHTML += `<img src="/uploads/${data.file}" alt="${data.file}" class="chat-image">`;
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />`;
     } else {
-      div.innerHTML += `<p>📎 <a href="/uploads/${data.file}" target="_blank">${data.file}</a></p>`;
+      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
     }
   }
 
+  div.innerHTML = content;
   chatWindow.appendChild(div);
 }
 
