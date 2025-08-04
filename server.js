@@ -23,37 +23,57 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Setup Multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads"),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+  destination: "uploads/",
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
 const upload = multer({ storage });
 
-// Routes
-app.get("/api/messages", async (req, res) => {
-  const messages = await Message.find().sort({ timestamp: 1 });
-  res.json(messages);
+app.use(express.static("public"));
+
+// Fetch chat history from DB
+app.get('/api/messages', async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ timestamp: 1 }).exec(); // Fetch messages sorted by timestamp
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching messages');
+  }
 });
 
-app.post("/api/messages", upload.single("file"), async (req, res) => {
-  const { username, text } = req.body;
-  const file = req.file ? req.file.filename : null;
+app.post('/api/messages', async (req, res) => {
+  const { username, text, file } = req.body;
+  const newMessage = new Message({
+    username,
+    text,
+    file: req.file ? req.file.filename : null,
+    timestamp: new Date()
+  });
 
-  const message = new Message({ username, text, file, timestamp: new Date() });
-  await message.save();
-
-  io.emit("chat", message);
-  res.status(201).json(message);
+  try {
+    await newMessage.save();
+    res.status(201).send('Message saved');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error saving message');
+  }
 });
 
 // Socket.IO connection
 io.on("connection", socket => {
-  console.log("User connected");
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on("chat", async ({ username, text, file }) => {
+    const msg = new Message({
+      username,
+      text,
+      file,
+      timestamp: new Date()
+    });
+    await msg.save();
+    io.emit("chat", msg);
   });
 });
 

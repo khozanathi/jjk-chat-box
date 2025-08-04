@@ -12,13 +12,15 @@ function sendMessage() {
 
   if (!username) return alert("Please enter your username!");
 
-  const formData = new FormData();
-  formData.append("username", username);
-  formData.append("text", text);
-  if (file) formData.append("file", file);
+  socket.emit("chat", { username, text, file })
 
-  fetch("/api/messages", {
-    method: "POST",
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('text', text);
+  if (fileInput.files[0]) formData.append('file', fileInput.files[0]);
+
+  fetch('/api/messages', {
+    method: 'POST',
     body: formData
   });
 
@@ -29,6 +31,43 @@ function sendMessage() {
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+  
+  div.innerHTML = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+  
+  if (data.file) {
+    const fileExtension = data.file.split('.').pop().toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+      div.innerHTML += `<img src="/uploads/${data.file}" alt="${data.file}" class="chat-image">`;
+    } else {
+      div.innerHTML += `<p>📎 <a href="/uploads/${data.file}" target="_blank">${data.file}</a></p>`;
+    }
+  }
+
+  chatWindow.appendChild(div);
+}
+
+// Load chat history on page load
+document.addEventListener("DOMContentLoaded", async () => {
+  const response = await fetch('/api/messages');
+  const messages = await response.json();
+
+  // Render the messages
+  messages.forEach(message => {
+    displayMessage(message);
+  });
+});
+
+/*socket.on("chat", data => {
+  // Display new message in the chat window
+  displayMessage(data);
+});*/
+
+// Socket event
+socket.on("chat", data => {
+  const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
+  const div = document.createElement("div");
+  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
 
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
@@ -37,26 +76,17 @@ function displayMessage(data) {
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
 
     if (isImage) {
-      content += `<p><img src="${fileUrl}" class="chat-image" alt="Image file" /></p>`;
+      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
     } else {
-      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
+      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
     }
   }
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
-}
-
-// Load chat history on page load
-document.addEventListener("DOMContentLoaded", async () => {
-  const response = await fetch("/api/messages");
-  const messages = await response.json();
-
-  messages.forEach(displayMessage);
+  // Display new message in the chat window
+  displayMessage(data);
 });
-
-// Socket event
-socket.on("chat", displayMessage);
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
