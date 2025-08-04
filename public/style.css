@@ -185,3 +185,12 @@ strong {
   margin-top: 5px;
 }
 
+iframe {
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+video, audio {
+  margin-top: 5px;
+  border-radius: 5px;
+}
