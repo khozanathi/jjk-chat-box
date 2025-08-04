@@ -36,6 +36,7 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
+const BACKEND_URL = "https://your-backend.onrender.com"; // Replace with your actual backend URL
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
@@ -43,7 +44,7 @@ function displayMessage(data) {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `/uploads/${data.file}`;
+    const fileUrl = `${BACKEND_URL}/uploads/${data.file}`;
     const fileExtension = data.file.split('.').pop().toLowerCase();
 
     if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
@@ -96,32 +97,6 @@ socket.on("chat", data => {
   // Display new message in the chat window
   displayMessage(data);
 });
-
-/* Socket event
-socket.on("chat", data => {
-  const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
-  const div = document.createElement("div");
-  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
-
-  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-
-  if (data.file) {
-    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
-
-    if (isImage) {
-      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
-    } else {
-      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
-    }
-  }
-
-  div.innerHTML = content;
-  chatWindow.appendChild(div);
-
-  // Display new message in the chat window
-  displayMessage(data);
-});
-*/
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);

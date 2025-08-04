@@ -80,6 +80,10 @@ io.on("connection", socket => {
   });
 });
 
+const cors = require("cors");
+app.use(cors());
+
 // Start the server
 const PORT = process.env.PORT || 7575;
 server.listen(7575, () => console.log("Server running on http://localhost:7575"));
+
