@@ -36,6 +36,8 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
+/*
+// iyasebenza leeee
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
@@ -48,7 +50,29 @@ function displayMessage(data) {
 
     if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
       content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />`;
-    } else if (fileExtension === "pdf") {
+    } else {
+      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
+    }
+  }
+
+  div.innerHTML = content;
+  chatWindow.appendChild(div);
+}
+*/
+
+function displayMessage(data) {
+  const div = document.createElement("div");
+  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+
+  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+
+  if (data.file) {
+    const fileUrl = `/uploads/${data.file}`;
+    const fileExtension = data.file.split('.').pop().toLowerCase();
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />`;
+    } else if (["pdf"].includes(fileExtension)) {
       content += `
         <p>📄 PDF Preview:</p>
         <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
@@ -77,16 +101,7 @@ function displayMessage(data) {
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
-
-   chatWindow.scrollTop = chatWindow.scrollHeight;
-
 }
-
-chatWindow.scrollTo({
-  top: chatWindow.scrollHeight,
-  behavior: "smooth"
-});
-
 
 // Load chat history on page load
 document.addEventListener("DOMContentLoaded", async () => {
