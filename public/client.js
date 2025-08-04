@@ -58,12 +58,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-/*socket.on("chat", data => {
+socket.on("chat", data => {
   // Display new message in the chat window
   displayMessage(data);
-});*/
+});
 
-// Socket event
+/* Socket event
 socket.on("chat", data => {
   const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
   const div = document.createElement("div");
@@ -87,7 +87,7 @@ socket.on("chat", data => {
   // Display new message in the chat window
   displayMessage(data);
 });
-
+*/
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
