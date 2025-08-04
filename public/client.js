@@ -36,8 +36,6 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
-/*
-// iyasebenza leeee
 function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
@@ -49,29 +47,9 @@ function displayMessage(data) {
     const fileExtension = data.file.split('.').pop().toLowerCase();
 
     if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
-      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />`;
-    } else {
-      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
-    }
-  }
-
-  div.innerHTML = content;
-  chatWindow.appendChild(div);
-}
-*/
-
-function displayMessage(data) {
-  const div = document.createElement("div");
-  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
-
-  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-
-  if (data.file) {
-    const fileUrl = `/uploads/${data.file}`;
-    const fileExtension = data.file.split('.').pop().toLowerCase();
-
-    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
-      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />`;
+      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
+      <p><a href="${fileUrl}" download>Download Image</a></p>
+      `;
     } else if (["pdf"].includes(fileExtension)) {
       content += `
         <p>📄 PDF Preview:</p>
