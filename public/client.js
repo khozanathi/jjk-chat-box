@@ -79,7 +79,15 @@ function displayMessage(data) {
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
+
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
+
+chatWindow.scrollTo({
+  top: chatWindow.scrollHeight,
+  behavior: "smooth"
+});
+
 
 // Load chat history on page load
 document.addEventListener("DOMContentLoaded", async () => {
@@ -96,32 +104,6 @@ socket.on("chat", data => {
   // Display new message in the chat window
   displayMessage(data);
 });
-
-/* Socket event
-socket.on("chat", data => {
-  const fileUrl = `https://jjk-chat-box.onrender.com/uploads/${data.file}`;
-  const div = document.createElement("div");
-  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
-
-  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-
-  if (data.file) {
-    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(data.file);
-
-    if (isImage) {
-      content += `<p><img src="${fileUrl}" width="200" alt="Image from ${data.username}" /></p>`;
-    } else {
-      content += `<p>📎 <a href="${fileUrl}" download>${data.file}</a></p>`;
-    }
-  }
-
-  div.innerHTML = content;
-  chatWindow.appendChild(div);
-
-  // Display new message in the chat window
-  displayMessage(data);
-});
-*/
 
 // Event listeners
 sendBtn.addEventListener("click", sendMessage);
