@@ -10,8 +10,6 @@ const fs = require("fs");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const safeName = file.originalname.replace(/[\s()]/g, "_");
-const filename = `${Date.now()}-${safeName}`;
 
 require('dotenv').config();
 
@@ -34,10 +32,7 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 // Setup Multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads"),
-  filename: (req, file, cb) => {
-    const safeName = file.originalname.replace(/[\s()]/g, "_");
-    cb(null, `${Date.now()}-${safeName}`);
-  }
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
 });
 
 const upload = multer({ storage });
