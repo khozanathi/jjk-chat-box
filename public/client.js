@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://your-backend.onrender.com";//https://your-backend.onrender.com/uploads
+const BACKEND_URL = "https://your-backend.onrender.com";
 const socket = io();
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
