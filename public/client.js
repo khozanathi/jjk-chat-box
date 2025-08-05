@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://your-backend.onrender.com";
+const BACKEND_URL = "https://your-backend.onrender.com";//https://your-backend.onrender.com/uploads
 const socket = io();
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
@@ -92,13 +92,16 @@ chatWindow.scrollTo({
 
 // Load chat history on page load
 document.addEventListener("DOMContentLoaded", async () => {
-  const response = await fetch('/api/messages');
-  const messages = await response.json();
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/messages`);
+    const messages = await response.json();
 
-  // Render the messages
-  messages.forEach(message => {
-    displayMessage(message);
-  });
+    messages.forEach(message => {
+      displayMessage(message);
+    });
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+  }
 });
 
 socket.on("chat", data => {
