@@ -1,3 +1,4 @@
+const BACKEND_URL = "https://your-backend.onrender.com";
 const socket = io();
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
@@ -43,32 +44,33 @@ function displayMessage(data) {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `/uploads/${data.file}`;
-    const fileExtension = data.file.split('.').pop().toLowerCase();
+    const fileUrl = `${BACKEND_URL}/uploads/${data.file}`;
+    const ext = data.file.split('.').pop().toLowerCase();
 
-    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
       content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
       <p><a href="${fileUrl}" download>Download Image</a></p>
       `;
-    } else if (["pdf"].includes(fileExtension)) {
+    } else if (ext === "pdf") {
       content += `
-        <p>📄 PDF Preview:</p>
         <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
         <p><a href="${fileUrl}" download>Download PDF</a></p>
       `;
-    } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+    }
+      else if (["mp4", "webm", "ogg"].includes(ext)) {
       content += `
         <p>🎥 Video:</p>
         <video controls width="300">
-          <source src="${fileUrl}" type="video/${fileExtension}">
+          <source src="${fileUrl}" type="video/${ext}">
           Your browser does not support the video tag.
         </video>
       `;
-    } else if (["mp3", "wav", "ogg"].includes(fileExtension)) {
+    }
+      else if (["mp3", "wav", "ogg"].includes(ext)) {
       content += `
         <p>🎧 Audio:</p>
         <audio controls>
-          <source src="${fileUrl}" type="audio/${fileExtension}">
+          <source src="${fileUrl}" type="audio/${ext}">
           Your browser does not support the audio element.
         </audio>
       `;
@@ -79,7 +81,6 @@ function displayMessage(data) {
 
   div.innerHTML = content;
   chatWindow.appendChild(div);
-
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
