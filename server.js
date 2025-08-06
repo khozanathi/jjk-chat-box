@@ -4,8 +4,10 @@ const path = require("path");
 const mongoose = require("mongoose");
 const socketIo = require("socket.io");
 const multer = require("multer");
-const Message = require("./models/Message"); // Message schema
 const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./config/cloudinary");
+const Message = require("./models/Message"); // Your MongoDB model
 
 const app = express();
 const server = http.createServer(app);
@@ -29,18 +31,54 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
+const MessageSchema = new mongoose.Schema({
+  username: String,
+  text: String,
+  file: String, // Stores Cloudinary URL
+  timestamp: Date
+});
+
+module.exports = mongoose.model("Message", MessageSchema);
+
 // Setup Multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads"),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+
+
+////////////////////////////////////
+
+const router = express.Router();
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "chatbox_uploads",
+    allowed_formats: ["jpg", "png", "pdf", "mp4", "mp3", "webm", "wav"],
+    public_id: (req, file) => `${Date.now()}-${file.originalname.replace(/[\s()]/g, "_")}`
+  }
 });
 
 const upload = multer({ storage });
 
+router.post("/api/messages", upload.single("file"), async (req, res) => {
+  const { username, text } = req.body;
+  const fileUrl = req.file ? req.file.path : null; // Cloudinary returns a public URL
+
+  const message = new Message({
+    username,
+    text,
+    file: fileUrl,
+    timestamp: new Date()
+  });
+
+  await message.save();
+  req.app.get("io").emit("chat", message); // Emit via Socket.IO
+  res.status(201).json(message);
+});
+/////////////////////////////////////
+/*
 app.post('/uploads', upload.single('file'), (req, res) => {
   console.log(req.file);
   res.send('File uploaded');
-});
+});*/
 
 app.use(express.static("public"));
 
