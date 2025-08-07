@@ -12,6 +12,7 @@ const Message = require("./models/Message"); // Your MongoDB model
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+app.set("io", io);
 
 require('dotenv').config();
 
