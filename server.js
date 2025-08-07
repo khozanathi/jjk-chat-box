@@ -31,16 +31,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
-const MessageSchema = new mongoose.Schema({
-  username: String,
-  text: String,
-  file: String, // Stores Cloudinary URL
-  timestamp: Date
-});
-
-module.exports = mongoose.model("Message", MessageSchema);
-module.exports = Message;
-
 const router = express.Router();
 
 const storage = new CloudinaryStorage({
