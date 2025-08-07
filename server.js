@@ -40,10 +40,9 @@ const MessageSchema = new mongoose.Schema({
 
 module.exports = mongoose.model("Message", MessageSchema);
 
-// Setup Multer for file uploads
-
-
-////////////////////////////////////
+// ✅ Prevent OverwriteModelError
+const Message = mongoose.models.Message || mongoose.model("Message", MessageSchema);
+module.exports = Message;
 
 const router = express.Router();
 
