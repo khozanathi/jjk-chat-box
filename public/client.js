@@ -36,51 +36,38 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
-function displayMessage(data) {
-  const div = document.createElement("div");
-  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+if (data.file) {
+  const fileUrl = data.file;
+  const fileExtension = fileUrl.split('.').pop().toLowerCase();
 
-  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
-
-  if (data.file) {
-    const fileUrl = data.file;
-    const fileExtension = data.file.split('.').pop().toLowerCase();
-
-    if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
-      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
-      <p><a href="${fileUrl}" download>Download Image</a></p>
-      `;
-    } else if (["pdf"].includes(fileExtension)) {
-      content += `
-        <p>📄 PDF Preview:</p>
-        <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
-        <p><a href="${fileUrl}" download>Download PDF</a></p>
-      `;
-    } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
-      content += `
-        <p>🎥 Video:</p>
-        <video controls width="300">
-          <source src="${fileUrl}" type="video/${fileExtension}">
-          Your browser does not support the video tag.
-        </video>
-      `;
-    } else if (["mp3", "wav", "ogg"].includes(fileExtension)) {
-      content += `
-        <p>🎧 Audio:</p>
-        <audio controls>
-          <source src="${fileUrl}" type="audio/${fileExtension}">
-          Your browser does not support the audio element.
-        </audio>
-      `;
-    } else {
-      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>${data.file}</a></p>`;
-    }
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+    content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
+    <p><a href="${fileUrl}" download>Download Image</a></p>`;
+  } else if (["pdf"].includes(fileExtension)) {
+    content += `
+      <p>📄 PDF Preview:</p>
+      <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
+      <p><a href="${fileUrl}" download>Download PDF</a></p>
+    `;
+  } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+    content += `
+      <p>🎥 Video:</p>
+      <video controls width="300">
+        <source src="${fileUrl}" type="video/${fileExtension}">
+        Your browser does not support the video tag.
+      </video>
+    `;
+  } else if (["mp3", "wav", "ogg"].includes(fileExtension)) {
+    content += `
+      <p>🎧 Audio:</p>
+      <audio controls>
+        <source src="${fileUrl}" type="audio/${fileExtension}">
+        Your browser does not support the audio element.
+      </audio>
+    `;
+  } else {
+    content += `<p>📎 <a href="${fileUrl}" target="_blank" download>Download File</a></p>`;
   }
-
-  div.innerHTML = content;
-  chatWindow.appendChild(div);
-
-  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 chatWindow.scrollTo({
