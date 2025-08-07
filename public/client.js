@@ -36,8 +36,14 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
-if (data.file) {
-  const fileUrl = data.file;
+function displayMessage(data) {
+  const div = document.createElement("div");
+  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+
+  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+
+  if (data.file) {
+  const fileUrl = data.file; // ✅ Cloudinary gives full URL
   const fileExtension = fileUrl.split('.').pop().toLowerCase();
 
   if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
@@ -68,6 +74,12 @@ if (data.file) {
   } else {
     content += `<p>📎 <a href="${fileUrl}" target="_blank" download>Download File</a></p>`;
   }
+}
+
+  div.innerHTML = content;
+  chatWindow.appendChild(div);
+
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 chatWindow.scrollTo({
