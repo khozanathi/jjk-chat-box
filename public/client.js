@@ -43,7 +43,7 @@ function displayMessage(data) {
   let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
 
   if (data.file) {
-    const fileUrl = `/uploads/${data.file}`;
+    const fileUrl = data.file;
     const fileExtension = data.file.split('.').pop().toLowerCase();
 
     if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {

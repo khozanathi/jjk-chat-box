@@ -46,7 +46,7 @@ const upload = multer({ storage });
 
 router.post("/api/messages", upload.single("file"), async (req, res) => {
   const { username, text } = req.body;
-  const fileUrl = req.file ? req.file.path : null; // Cloudinary returns a public URL
+  const fileUrl = req.file ? req.file.path : null; // ✅ Cloudinary returns a public URL
 
   const message = new Message({
     username,
@@ -56,10 +56,11 @@ router.post("/api/messages", upload.single("file"), async (req, res) => {
   });
 
   await message.save();
-  req.app.get("io").emit("chat", message); // Emit via Socket.IO
+  req.app.get("io").emit("chat", message);
   res.status(201).json(message);
 });
-/////////////////////////////////////
+
+app.use(router); // Add this line to register your router
 /*
 app.post('/uploads', upload.single('file'), (req, res) => {
   console.log(req.file);
@@ -77,17 +78,6 @@ app.get('/api/messages', async (req, res) => {
     console.error(err);
     res.status(500).send('Error fetching messages');
   }
-});
-
-app.post("/api/messages", upload.single("file"), async (req, res) => {
-  const { username, text } = req.body;
-  const file = req.file ? req.file.filename : null;
-
-  const message = new Message({ username, text, file, timestamp: new Date() });
-  await message.save();
-
-  io.emit("chat", message);
-  res.status(201).json(message);
 });
 
 // Socket.IO connection
