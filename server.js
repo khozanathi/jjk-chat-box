@@ -39,9 +39,6 @@ const MessageSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("Message", MessageSchema);
-
-// ✅ Prevent OverwriteModelError
-Message = mongoose.models.Message || mongoose.model("Message", MessageSchema);
 module.exports = Message;
 
 const router = express.Router();
