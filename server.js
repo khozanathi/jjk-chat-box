@@ -34,18 +34,18 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 const router = express.Router();
 
-const originalName = file.originalname.replace(/[\s()]/g, "_").replace(/\.pdf\.pdf$/, ".pdf");
-
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "chatbox_uploads",
-    resource_type: "auto", // ✅ auto-detects file type
+    resource_type: "auto",
     allowed_formats: ["jpg", "png", "pdf", "mp4", "mp3", "webm", "wav"],
-    public_id: (req, file) => `${Date.now()}-${file.originalname.replace(/[\s()]/g, "_")}`
+    public_id: (req, file) => {
+      const safeName = file.originalname.replace(/[\s()]/g, "_").replace(/\.pdf\.pdf$/, ".pdf");
+      return `${Date.now()}-${safeName}`;
+    }
   }
 });
-
 const upload = multer({ storage });
 
 router.post("/api/messages", upload.single("file"), async (req, res) => {
