@@ -34,8 +34,6 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 const router = express.Router();
 
-const ext = path.extname(file.originalname);
-const base = path.basename(file.originalname, ext);
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -43,6 +41,8 @@ const storage = new CloudinaryStorage({
     resource_type: "raw",
     allowed_formats: ["jpg", "png", "pdf", "mp4", "mp3", "webm", "wav"],
     public_id: (req, file) => {
+      const ext = path.extname(file.originalname);
+      const base = path.basename(file.originalname, ext);
       const safeName = `${base.replace(/[\s()]/g, "_")}${ext}`;
       return `${Date.now()}-${safeName}`;
     }
