@@ -36,18 +36,27 @@ const router = express.Router();
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "chatbox_uploads",
-    resource_type: "auto", // ✅ handles images, PDFs, videos, etc.
-    public_id: (req, file) => {
-      const ext = path.extname(file.originalname);
-      const base = path.basename(file.originalname, ext);
-      const safeName = `${base.replace(/[\s()]/g, "_")}${ext}`;
-      return `${Date.now()}-${safeName}`;
-    }
+  params: async (req, file) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
+    const safeName = `${base.replace(/[\s()]/g, "_")}${ext}`;
+
+    // ✅ Detect file type and set resource_type
+    const isPdf = ext.toLowerCase() === ".pdf";
+    const isVideo = [".mp4", ".webm", ".ogg"].includes(ext.toLowerCase());
+    const isAudio = [".mp3", ".wav", ".ogg"].includes(ext.toLowerCase());
+
+    let resourceType = "image"; // default
+    if (isPdf) resourceType = "raw";
+    else if (isVideo || isAudio) resourceType = "video";
+
+    return {
+      folder: "chatbox_uploads",
+      public_id: `${Date.now()}-${safeName}`,
+      resource_type: resourceType
+    };
   }
 });
-
 const upload = multer({ storage });
 
 /*router.post("/api/messages", upload.single("file"), async (req, res) => {
