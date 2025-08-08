@@ -38,7 +38,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "chatbox_uploads",
-    resource_type: "raw",
+    resource_type: "auto",
     allowed_formats: ["jpg", "png", "pdf", "mp4", "mp3", "webm", "wav"],
     public_id: (req, file) => {
       const ext = path.extname(file.originalname);
