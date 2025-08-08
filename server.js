@@ -38,8 +38,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "chatbox_uploads",
-    resource_type: "auto",
-    allowed_formats: ["jpg", "png", "pdf", "mp4", "mp3", "webm", "wav"],
+    resource_type: "auto", // ✅ handles images, PDFs, videos, etc.
     public_id: (req, file) => {
       const ext = path.extname(file.originalname);
       const base = path.basename(file.originalname, ext);
@@ -48,9 +47,10 @@ const storage = new CloudinaryStorage({
     }
   }
 });
+
 const upload = multer({ storage });
 
-router.post("/api/messages", upload.single("file"), async (req, res) => {
+/*router.post("/api/messages", upload.single("file"), async (req, res) => {
   const { username, text } = req.body;
   const fileUrl = req.file ? req.file.path : null; // ✅ Cloudinary returns a public URL
 
@@ -63,6 +63,22 @@ router.post("/api/messages", upload.single("file"), async (req, res) => {
 
   await message.save();
   req.app.get("io").emit("chat", message);
+  res.status(201).json(message);
+});*/
+
+app.post("/api/messages", upload.single("file"), async (req, res) => {
+  const { username, text } = req.body;
+  const fileUrl = req.file ? req.file.path : null; // ✅ Cloudinary returns full public URL
+
+  const message = new Message({
+    username,
+    text,
+    file: fileUrl,
+    timestamp: new Date()
+  });
+
+  await message.save();
+  io.emit("chat", message);
   res.status(201).json(message);
 });
 

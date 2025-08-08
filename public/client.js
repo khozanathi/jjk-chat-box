@@ -36,7 +36,7 @@ async function sendMessage() {
   document.getElementById("filePreview").innerHTML = "";
 }
 
-function displayMessage(data) {
+/*function displayMessage(data) {
   const div = document.createElement("div");
   div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
 
@@ -80,12 +80,57 @@ function displayMessage(data) {
   chatWindow.appendChild(div);
 
   chatWindow.scrollTop = chatWindow.scrollHeight;
-}
+}*/
 
 chatWindow.scrollTo({
   top: chatWindow.scrollHeight,
   behavior: "smooth"
 });
+
+function displayMessage(data) {
+  const div = document.createElement("div");
+  div.className = data.username === usernameInput.value.trim() ? "sender" : "receiver";
+
+  let content = `<p><strong>${data.username}:</strong> ${data.text}</p>`;
+
+  if (data.file) {
+    const fileUrl = data.file;
+    const ext = fileUrl.split('.').pop().toLowerCase();
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
+      content += `<img src="${fileUrl}" class="chat-image" alt="Image file" />
+      <p><a href="${fileUrl}" download>Download Image</a></p>`;
+    } else if (ext === "pdf") {
+      content += `
+        <p>📄 PDF Preview:</p>
+        <iframe src="${fileUrl}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>
+        <p><a href="${fileUrl}" target="_blank" download>Download PDF</a></p>
+      `;
+    } else if (["mp4", "webm", "ogg"].includes(ext)) {
+      content += `
+        <p>🎥 Video:</p>
+        <video controls width="300">
+          <source src="${fileUrl}" type="video/${ext}">
+          Your browser does not support the video tag.
+        </video>
+      `;
+    } else if (["mp3", "wav", "ogg"].includes(ext)) {
+      content += `
+        <p>🎧 Audio:</p>
+        <audio controls>
+          <source src="${fileUrl}" type="audio/${ext}">
+          Your browser does not support the audio element.
+        </audio>
+      `;
+    } else {
+      content += `<p>📎 <a href="${fileUrl}" target="_blank" download>Download File</a></p>`;
+    }
+  }
+
+  div.innerHTML = content;
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
 
 // Load chat history on page load
